@@ -167,7 +167,9 @@ class IBLSession(gym.Env):
 
         # target has shape (batch=1,). Reshape to (1, 1) to match action with shape
         # (batch = 1, 1) for loss function
-        is_blank_rnn_step = left_stimulus == 0 and right_stimulus == 0
+        is_blank_rnn_step = (
+            left_stimulus == 0 and right_stimulus == 0
+        )  # only for the first step as per the new params
         loss = self.loss_fn(
             target=correct_action_index.reshape((1,)).long(),
             action_probs=model_prob_output,
@@ -432,8 +434,10 @@ class IBLSession(gym.Env):
             current_block_side = 1 if current_block_side == 0 else 0
 
         # zero out stimuli for first rnn_steps_before_stimulus
+        # used to be block_stimuli[:,:2,:]
+
         for block_stimuli in stimuli:
-            block_stimuli[:, :2, :] = 0
+            block_stimuli[:, : self.rnn_steps_before_obs, :] = 0
 
         return stimuli, trial_strengths, trial_sides, block_sides
 
