@@ -5,7 +5,7 @@ train_params = {
             "input_size": 3,
             "output_size": 2,
             "core_kwargs": {"num_layers": 1, "hidden_size": 15},
-            "param_init": "-",
+            "param_init": "default",
             "connectivity_kwargs": {
                 "input_mask": "none",
                 "recurrent_mask": "none",
