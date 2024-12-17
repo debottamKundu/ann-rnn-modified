@@ -133,7 +133,7 @@ def create_params_analyze(train_run_dir):
 
     # replace some defaults
     # env_kwargs['trials_per_block_param'] = 1 / 65  # make longer blocks more common
-    params['env']['kwargs']['blocks_per_session'] = 1000
+    params['env']['kwargs']['blocks_per_session'] = 100
     # params['env']['kwargs']['blocks_per_session'] = 100
     # params['env']['kwargs']['blocks_per_session'] = 50
 
@@ -152,7 +152,7 @@ def create_run_id(params):
         'max_stim_strength=' + str(params['env']['kwargs']['max_stimulus_strength']),
         'hidden_size=' + str(params['model']['kwargs']['core_kwargs']['hidden_size']),
     ]
-    separator = ', '
+    separator = '_'
     run_id = separator.join(str(ip) for ip in included_params)
     return run_id
 
@@ -213,15 +213,19 @@ def extract_session_data(envs):
 
 
 def load_checkpoint(train_run_dir,
-                    params):
+                    params,sort_index):
     # collect last checkpoint in the log directory
     checkpoint_paths = [os.path.join(train_run_dir, file_path)
                         for file_path in os.listdir(train_run_dir)
                         if file_path.endswith('.pt')]
 
     # select latest checkpoint path
-    checkpoint_path = sorted(checkpoint_paths, key=os.path.getmtime)[-1]
+    #checkpoint_path = sorted(checkpoint_paths, key=os.path.getmtime)[-1]
 
+    #hacky way to get the best, cause i'm running on the local system
+    
+    checkpoint_path = sorted(checkpoint_paths)[sort_index] #hardcoded to get the last saved checkpoint
+    print(checkpoint_path)
     logging.info(f'Loading checkpoint at {checkpoint_path}')
 
     save_dict = torch.load(checkpoint_path)
@@ -333,9 +337,9 @@ def set_seeds(seed):
     logging.info(f'Seed: {seed}')
 
 
-def setup_analyze(train_run_id):
+def setup_analyze(train_run_id, sort_index=2):
 
-    run_dir = 'runs'
+    run_dir = "D:\\personal\\phD\\code\\ann-rnns\\runs"
     train_run_dir = os.path.join(run_dir, train_run_id)
     analyze_run_dir = os.path.join(train_run_dir, 'analyze')
     os.makedirs(analyze_run_dir, exist_ok=True)
@@ -346,7 +350,8 @@ def setup_analyze(train_run_id):
         run_dir=analyze_run_dir)
     model, optimizer, checkpoint_grad_step = load_checkpoint(
         train_run_dir=train_run_dir,
-        params=params)
+        params=params,
+        sort_index=sort_index)
     loss_fn = create_loss_fn(
         loss_fn_params=params['loss_fn'])
     fn_hook_dict = utils.hooks.create_hook_fns_analyze(
@@ -376,7 +381,8 @@ def setup_train():
 
     params = create_params_train()
     run_id = create_run_id(params=params)
-    run_dir = os.path.join(log_dir, run_id + '_' + str(datetime.now()))
+    run_dir = os.path.join(log_dir, run_id + '_' + str(datetime.now()).replace(":","-"))
+    #run_dir = os.path.join(log_dir, run_id + '_' + str(datetime.now()))
     os.makedirs(run_dir, exist_ok=True)
 
     create_logger(run_dir=run_dir)

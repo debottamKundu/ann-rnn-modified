@@ -1,13 +1,14 @@
 from itertools import product
 import logging
 import matplotlib.cm as cm
-from matplotlib.colors import DivergingNorm, ListedColormap
+from matplotlib.colors import TwoSlopeNorm as DivergingNorm
+from matplotlib.colors import  ListedColormap
 # import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import numpy as np
 import os
 import pandas as pd
-from psytrack.plot.analysisFunctions import makeWeightPlot
+#from psytrack.plot.analysisFunctions import makeWeightPlot
 import scipy.stats
 import scipy.cluster.hierarchy as spc
 import seaborn as sns
@@ -1232,7 +1233,7 @@ def hook_plot_behav_subj_prob_block_switch_by_signed_trial_strength(hook_input):
                  '3_back_correct',
                  'prev_left_action_prob',
                  'subjective_block_switch'],
-        dtype=np.float16)
+        dtype=np.float32)
 
     for session_index, per_session_data in session_data.groupby(['session_index']):
         # TODO lambda breaks if len(x) < 2

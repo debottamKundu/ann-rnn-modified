@@ -2,3 +2,6 @@
 runs/
 **.pyc
 **.mp4
+src/
+submodule*/
+*.DS_Store

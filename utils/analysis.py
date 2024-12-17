@@ -11,7 +11,7 @@ from psytrack.hyperOpt import hyperOpt
 from scipy.linalg import solve_discrete_lyapunov
 import scipy.spatial
 from scipy.stats import norm
-from sklearn.decomposition.pca import PCA
+from sklearn.decomposition import PCA
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.random_projection import GaussianRandomProjection
@@ -332,7 +332,7 @@ def compute_model_fixed_points_basins_of_attraction(fixed_point_df):
         np.nan,
         columns=columns,
         index=index,
-        dtype=np.float16
+        dtype=np.float32
     )
 
     for column in ['fixed_point_state', 'pca_fixed_point_state', 'hidden_states_in_basin',
@@ -526,7 +526,7 @@ def compute_model_fixed_points_by_stimulus_and_feedback(model,
         np.nan,  # initialize all to nan
         index=np.arange(len(sampled_states) * len(possible_stimuli)),
         columns=columns,
-        dtype=np.float16)
+        dtype=np.float32)
     for column in ['initial_sampled_state', 'second_sampled_state', 'initial_pca_sampled_state',
                    'second_pca_sampled_state', 'final_sampled_state', 'final_pca_sampled_state',
                    'jacobian_hidden', 'jacobian_hidden_sym', 'jacobian_hidden_eigenspectrum',
@@ -708,7 +708,7 @@ def compute_model_fixed_points_jacobians(model,
     model_jacobians_results['jacobian_hidden_stable'] = np.logical_and(
         np.all(np.abs(np.real(model_jacobians_results['jacobian_hidden_eigenspectrum'])) < 1,
                axis=1),
-        displacement_norm < np.quantile(displacement_norm, .05)).astype(np.float16)
+        displacement_norm < np.quantile(displacement_norm, .05)).astype(np.float32)
 
     jacobians_hidden_sym = 0.5 * (
             jacobians_hidden + np.transpose(jacobians_hidden, axes=(0, 2, 1)))
@@ -720,7 +720,7 @@ def compute_model_fixed_points_jacobians(model,
     model_jacobians_results['jacobian_hidden_sym_stable'] = np.logical_and(
         np.all(np.abs(np.real(model_jacobians_results['jacobian_hidden_sym_eigenspectrum'])) < 1,
                axis=1),
-        np.quantile(displacement_norm, .05)).astype(np.float16)
+        np.quantile(displacement_norm, .05)).astype(np.float32)
 
     return model_jacobians_results
 
@@ -748,7 +748,7 @@ def compute_model_fixed_points_jacobians_projected(fixed_point_df,
     jacobians_pca_stable = np.logical_and(
         np.all(np.abs(np.real(jacobians_pca_eigenspectra)) < 1, axis=1),
         pca_displacement_norm < np.quantile(pca_displacement_norm, .05),
-    ).astype(np.float16)
+    ).astype(np.float32)
     logging.info(f'Fraction of stable PCA Jacobians: {np.mean(jacobians_pca_stable)}')
 
     jacobians_jlm = jlm.components_ @ jacobians @ jlm.components_.T
@@ -765,7 +765,7 @@ def compute_model_fixed_points_jacobians_projected(fixed_point_df,
     jacobians_jlm_stable = np.logical_and(
         np.all(np.abs(np.real(jacobians_jlm_eigenspectra)) < 1, axis=1),
         jlm_displacement_norm < np.quantile(jlm_displacement_norm, .05),
-    ).astype(np.float16)
+    ).astype(np.float32)
     logging.info(f'Fraction of stable JL Jacobians: {np.mean(jacobians_jlm_stable)}')
 
     col_names = [
@@ -812,7 +812,7 @@ def compute_model_fixed_points_jacobians_projected(fixed_point_df,
 #
 #     vector_fields_df = pd.DataFrame(
 #         columns=columns,
-#         dtype=np.float16)
+#         dtype=np.float32)
 #
 #     # enable storing hidden states in the dataframe.
 #     # need to make the column have type object to doing so possible
@@ -1107,7 +1107,7 @@ def compute_state_space_vector_fields(session_data,
         columns=['left_stimulus', 'right_stimulus', 'feedback',
                  'pca_hidden_states_pre', 'pca_hidden_states_post',
                  'displacement_pca', 'displacement_pca_norm'],
-        dtype=np.float16)
+        dtype=np.float32)
     for column in ['pca_hidden_states_pre', 'pca_hidden_states_post', 'displacement_pca', 'displacement_pca_norm']:
         model_state_space_vector_fields[column] = model_state_space_vector_fields.astype(np.object)
 
@@ -1612,7 +1612,7 @@ def compute_optimal_prob_correct_blockless(session_data,
         np.nan,  # initialize all to nan
         index=possible_num_obs_within_trial,
         columns=trial_end_data.trial_strength.unique(),
-        dtype=np.float16)
+        dtype=np.float32)
     for mu, number_of_trials in trial_end_data.groupby(['trial_strength']).size().iteritems():
         ideal_prob_correct_after_dt_per_trial_given_mu = np.array([
             1 - norm.cdf(-mu * np.sqrt(num_obs_within_trial)) if num_obs_within_trial > 0 else 0.5
@@ -1927,7 +1927,7 @@ def distill_model_traditional(model_to_distill,
             return torch.mean(cross_entropy)
 
         logging.info(f'Training traditionally distilled model for {num_gradient_steps} steps...')
-        training_losses = np.zeros(num_gradient_steps, dtype=np.float16)
+        training_losses = np.zeros(num_gradient_steps, dtype=np.float32)
         for grad_step in range(num_gradient_steps):
             if hasattr(traditionally_distilled_model, 'reset_core_hidden'):
                 traditionally_distilled_model.reset_core_hidden()

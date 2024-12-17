@@ -571,7 +571,7 @@ class RecurrentModel(nn.Module):
             first_column = np.zeros(shape=output_shape)
             first_column[:int(0.2 * output_shape)] = 1.
             connectivity_mask = scipy.linalg.circulant(c=first_column)
-        elif mask_type_str == 'toeplitz':
+        elif mask_type_str == '-':
             first_column = np.zeros(shape=output_shape)
             first_column[:int(0.2 * output_shape)] = 1.
             connectivity_mask = scipy.linalg.toeplitz(c=first_column)

@@ -30,7 +30,7 @@ def create_hook_fns_dict(hook_fns_frequencies,
                 start=start_grad_step,
                 stop=start_grad_step + num_grad_steps,
                 step=freq,
-                dtype=np.int)
+                dtype=int)
 
         # add hook object reference to hooks_fn_dict at appropriate steps
         for grad_step in hook_call_at_grad_steps:
