@@ -40,10 +40,10 @@ train_params = {
             "blocks_per_session": 4,
             "min_trials_per_block": 20,
             "max_trials_per_block": 100,
-            "max_obs_per_trial": 10,
+            "max_obs_per_trial": 12,
             "rnn_steps_before_obs": 1,
-            "time_delay_penalty": -0.01,
+            "time_delay_penalty": -0.005,
         },
     },
-    "description": "Low time delay penalty of 0.01, 1 step before RNN is allowed to respond, lower max stim strength, 1.25 variance.",
+    "description": "Low time delay penalty of 0.005, 1 step before RNN is allowed to respond, lower max stim strength, 1.25 variance. higher penaly for mistakes compared to time delay",
 }
