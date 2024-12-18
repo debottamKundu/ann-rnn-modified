@@ -34,7 +34,7 @@ train_params = {
         "kwargs": {
             "num_stimulus_strength": 6,
             "min_stimulus_strength": 0,
-            "max_stimulus_strength": 2.5,
+            "max_stimulus_strength": 1.5,
             "block_side_probs": ((0.8, 0.2), (0.2, 0.8)),
             "trials_per_block_param": 1 / 50,
             "blocks_per_session": 4,
@@ -45,5 +45,5 @@ train_params = {
             "time_delay_penalty": -0.01,
         },
     },
-    "description": "Low time delay penalty of 0.01, 1 step before RNN is allowed to respond.",
+    "description": "Low time delay penalty of 0.01, 1 step before RNN is allowed to respond, lower max stim strength, 1.25 variance.",
 }
