@@ -1,7 +1,0 @@
-INFO:root:Logger created successfully
-INFO:root:Logger created successfully
-INFO:root:Seed: 1
-INFO:root:Loading checkpoint at /Users/dkundu/Documents/phd/ann-rnn-modified/runs/noisydata_with_choiced/checkpoint_grad_steps=10000.pt
-INFO:root:Logger created successfully
-INFO:root:Seed: 1
-INFO:root:Loading checkpoint at /Users/dkundu/Documents/phd/ann-rnn-modified/runs/noisydata_with_choiced/checkpoint_grad_steps=10000.pt

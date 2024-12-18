@@ -5,3 +5,4 @@ runs/
 src/
 submodule*/
 *.DS_Store
+*.pkl
