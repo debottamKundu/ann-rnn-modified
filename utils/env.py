@@ -44,7 +44,10 @@ class IBLSession(gym.Env):
         self.max_trials_per_block = max_trials_per_block
         self.rnn_steps_before_obs = rnn_steps_before_obs
         self.max_obs_per_trial = max_obs_per_trial
+
+        # NOTE : fixed regime, no time delay penalty
         self.time_delay_penalty = time_delay_penalty
+
         self.possible_trial_strengths = tuple(
             np.linspace(
                 min_stimulus_strength, max_stimulus_strength, num_stimulus_strength
@@ -178,6 +181,7 @@ class IBLSession(gym.Env):
         )  # * self.current_rnn_step_within_trial
         self.losses[self.current_rnn_step_within_session] = loss
 
+        # NOTE: maybe need to change something here?
         is_timeout = (
             self.current_rnn_step_within_trial + 1
         ) == self.max_rnn_steps_per_trial
@@ -219,7 +223,11 @@ class IBLSession(gym.Env):
 
         # move to next trial if either (i) maxed out number of rnn_steps within trial
         # or model made an action i.e. receive a reward/punishment
-        if abs(reward.item()) > 0.9:
+
+        # add constraint so that the model takes action only at the end of the trial
+        if (
+            abs(reward.item()) > 0.9
+        ):  # and self.current_rnn_step_within_trial == self.max_rnn_steps_per_trial:
 
             # record whether action was taken, which side, and whether it was correct
             if left_action_prob > 0.9 or right_action_prob > 0.9:
@@ -349,7 +357,7 @@ class IBLSession(gym.Env):
                 # reward = torch.zeros(1).double()
                 reward = (
                     torch.zeros(1).fill_(self.time_delay_penalty).double()
-                )  # NOTE : time_delay_penalty, can be increased
+                )  # NOTE : should remove time delay penalty in case of fixed regime
 
             return reward
 
