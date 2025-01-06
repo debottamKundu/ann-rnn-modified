@@ -17,7 +17,7 @@ if __name__ == "__main__":
 
     # train_run_id = 'rnn_max_stim_strength=2.5_hidden_size=50_2024-11-08 17-46-31.791839' # old training run id
 
-    train_run_id = "noisydata_with_choiced"  # new training run id
+    train_run_id = "noisydatachoicee"  # new training run id
     run_dir = "/usr/people/kundu/code/ann-rnn-modified/runs"
     train_run_dir = os.path.join(run_dir, train_run_id)
     analyze_run_dir = os.path.join(train_run_dir, "analyze")
@@ -53,7 +53,7 @@ if __name__ == "__main__":
         )
         try:
             with open(
-                f"/usr/people/kundu/code/ann-rnn-modified/data/noisydatachoiced/rnn_ann_model_results_10units_{fname_idx}.pkl",
+                f"/usr/people/kundu/code/ann-rnn-modified/data/noisydatachoicee/rnn_ann_model_results_10units_{fname_idx}.pkl",
                 "wb",
             ) as f:
                 pkl.dump(run_envs_output, f)

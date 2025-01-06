@@ -332,11 +332,11 @@ class IBLSession(gym.Env):
                 # for an action to be rewarded, the model must have made the correct choice
                 # also, punish model if action was incorrect
                 # reward = 2.0 * (target == max_prob_idx).double() - 1.0
-                # changing reward to 1.0 for correct and -2.0 for incorrect
+                # changing reward to 1.0 for correct and -2.0 for incorrect for the latest run
                 if target == max_prob_idx:
                     reward = torch.zeros(1).fill_(1).double()
                 else:
-                    reward = torch.zeros(1).fill_(-2).double()
+                    reward = torch.zeros(1).fill_(-1).double()
 
                     # penalises model more for incorrect decisions.
             elif is_timeout:
