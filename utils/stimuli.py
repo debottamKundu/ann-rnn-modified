@@ -15,7 +15,7 @@ def create_block_stimuli(
 
     # sample standard normal noise for both left and right stimuli
     sampled_stimuli = np.random.normal(
-        loc=0.0, scale=1.25, size=(num_trials, max_rnn_steps_per_trial, 2)
+        loc=0.0, scale=1.0, size=(num_trials, max_rnn_steps_per_trial, 2)
     )
 
     # now, determine which sides will have signal

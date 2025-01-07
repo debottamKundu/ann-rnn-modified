@@ -11,7 +11,7 @@ from torch.utils.tensorboard import SummaryWriter
 import re
 
 import utils.env
-#import utils.hooks
+import utils.hooks
 import utils.models
 import utils.params
 

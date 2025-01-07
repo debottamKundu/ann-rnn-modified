@@ -4,7 +4,7 @@ train_params = {
         "kwargs": {
             "input_size": 3,
             "output_size": 2,
-            "core_kwargs": {"num_layers": 1, "hidden_size": 15},
+            "core_kwargs": {"num_layers": 1, "hidden_size": 10},
             "param_init": "default",
             "connectivity_kwargs": {
                 "input_mask": "none",
@@ -26,24 +26,24 @@ train_params = {
     "loss_fn": {"loss_fn": "nll"},
     "run": {
         "start_grad_step": 0,
-        "num_grad_steps": 100001,
+        "num_grad_steps": 50000,
         "seed": 1,
     },
     "env": {
         "num_sessions": 1,  # batch size
         "kwargs": {
-            "num_stimulus_strength": 6,
-            "min_stimulus_strength": 0,
-            "max_stimulus_strength": 1.5,
-            "block_side_probs": ((0.8, 0.2), (0.2, 0.8)),
+            "num_stimulus_strength": 2,
+            "min_stimulus_strength": 1,
+            "max_stimulus_strength": 2.5,
+            "block_side_probs": ((0.5, 0.5), (0.5, 0.5)),
             "trials_per_block_param": 1 / 50,
             "blocks_per_session": 4,
             "min_trials_per_block": 20,
             "max_trials_per_block": 100,
             "max_obs_per_trial": 12,
             "rnn_steps_before_obs": 1,
-            "time_delay_penalty": -0.005,
+            "time_delay_penalty": -0.05,
         },
     },
-    "description": "Low time delay penalty of 0.005, 1 step before RNN is allowed to respond, lower max stim strength, 1.25 variance. higher penaly for mistakes compared to time delay",
+    "description":"Only one stimulus strength, max stimulus strength of 2.5 and variance of 1.0, more hidden layer, 2 stim strengthss",
 }
