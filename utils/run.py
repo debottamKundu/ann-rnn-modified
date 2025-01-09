@@ -11,7 +11,7 @@ from torch.utils.tensorboard import SummaryWriter
 import re
 
 import utils.env
-#import utils.hooks
+import utils.hooks
 import utils.models
 import utils.params
 
@@ -375,7 +375,7 @@ def setup_analyze(train_run_id, sort_index=2):
         train_run_dir=train_run_dir, params=params, sort_index=sort_index
     )
     loss_fn = create_loss_fn(loss_fn_params=params["loss_fn"])
-    #fn_hook_dict = utils.hooks.create_hook_fns_analyze(checkpoint_grad_step=checkpoint_grad_step)
+    # fn_hook_dict = utils.hooks.create_hook_fns_analyze(checkpoint_grad_step=checkpoint_grad_step)
     envs = utils.env.create_biased_choice_worlds(
         env_params=params["env"], base_loss_fn=loss_fn
     )
@@ -387,7 +387,7 @@ def setup_analyze(train_run_id, sort_index=2):
         model=model,
         optimizer=optimizer,
         loss_fn=loss_fn,
-        #fn_hook_dict=fn_hook_dict,
+        # fn_hook_dict=fn_hook_dict,
         envs=envs,
         checkpoint_grad_step=checkpoint_grad_step,
     )

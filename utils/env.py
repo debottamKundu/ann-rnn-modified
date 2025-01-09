@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import torch
 from torch.nn import CrossEntropyLoss, NLLLoss
+import logging
 
 from utils.stimuli import create_block_stimuli
 from utils.vec_env import VecEnv
@@ -25,7 +26,7 @@ class IBLSession(gym.Env):
         max_obs_per_trial,
         time_delay_penalty,
         rnn_steps_before_obs,
-        **kwargs
+        **kwargs,
     ):
 
         # TODO: are these necessary
@@ -173,6 +174,7 @@ class IBLSession(gym.Env):
         is_blank_rnn_step = (
             left_stimulus == 0 and right_stimulus == 0
         )  # only for the first step as per the new params
+
         loss = self.loss_fn(
             target=correct_action_index.reshape((1,)).long(),
             action_probs=model_prob_output,
@@ -221,14 +223,13 @@ class IBLSession(gym.Env):
         # advance current rnn step within trial.
         self.current_rnn_step_within_trial += 1
 
-        # move to next trial if either (i) maxed out number of rnn_steps within trial
+        # move to next trial if model  maxed out number of rnn_steps within trial
         # or model made an action i.e. receive a reward/punishment
 
         # add constraint so that the model takes action only at the end of the trial
-        if (
-            abs(reward.item()) > 0.9
-        ):  # and self.current_rnn_step_within_trial == self.max_rnn_steps_per_trial:
-
+        # NOTE: need to make changes here
+        # if abs(reward.item()) > 0.9:
+        if self.current_rnn_step_within_trial == self.max_rnn_steps_per_trial:
             # record whether action was taken, which side, and whether it was correct
             if left_action_prob > 0.9 or right_action_prob > 0.9:
                 self.session_data.at[
@@ -332,6 +333,7 @@ class IBLSession(gym.Env):
 
         def reward_fn(target, input, is_timeout, is_blank_rnn_step):
 
+            # is_timeout tracks the final step, add is_timeout to the reward
             max_prob, max_prob_idx = torch.max(input, dim=1)
 
             if is_blank_rnn_step:
@@ -342,13 +344,21 @@ class IBLSession(gym.Env):
                 # reward = 2.0 * (target == max_prob_idx).double() - 1.0
                 # changing reward to 1.0 for correct and -2.0 for incorrect for the latest run
                 if target == max_prob_idx:
-                    reward = torch.zeros(1).fill_(1).double()
+                    if is_timeout:
+                        logging.info(
+                            "Correct action taken at the last step, actually in loop"
+                        )
+                        reward = torch.zeros(1).fill_(1).double()
+                    else:
+                        logging.info(
+                            "Correct action taken at the some step before last step, actually in loop"
+                        )
+                        reward = torch.zeros(1).fill_(0.5).double()
                 else:
                     reward = torch.zeros(1).fill_(-1).double()
-
                     # penalises model more for incorrect decisions.
             elif is_timeout:
-                # punish model for timing out
+                # punish model for timing outß
                 reward = (
                     torch.zeros(1).fill_(-1).double()
                 )  # NOTE: -1 penalty for timing out, we can reduce this to ensure longer integration
@@ -357,7 +367,7 @@ class IBLSession(gym.Env):
                 # reward = torch.zeros(1).double()
                 reward = (
                     torch.zeros(1).fill_(self.time_delay_penalty).double()
-                )  # NOTE : should remove time delay penalty in case of fixed regime
+                )  # NOTE : set this to zero in parameters.
 
             return reward
 
