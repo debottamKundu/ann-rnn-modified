@@ -345,15 +345,15 @@ class IBLSession(gym.Env):
                 # changing reward to 1.0 for correct and -2.0 for incorrect for the latest run
                 if target == max_prob_idx:
                     if is_timeout:
-                        logging.info(
-                            "Correct action taken at the last step, actually in loop"
-                        )
+                        #logging.info(
+                        #    "Correct action taken at the last step, actually in loop"
+                        #)
                         reward = torch.zeros(1).fill_(1).double()
                     else:
-                        logging.info(
-                            "Correct action taken at the some step before last step, actually in loop"
-                        )
-                        reward = torch.zeros(1).fill_(0.5).double()
+                        #logging.info(
+                        #    "Correct action taken at the some step before last step, actually in loop"
+                        #)
+                        reward = torch.zeros(1).fill_(0.05).double()
                 else:
                     reward = torch.zeros(1).fill_(-1).double()
                     # penalises model more for incorrect decisions.
