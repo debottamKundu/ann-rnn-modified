@@ -10,12 +10,15 @@ def create_block_stimuli(
     possible_trial_strengths,
     possible_trial_strengths_probs,
     max_rnn_steps_per_trial,
+    noise_mean=0.0,
+    noise_std=1.0,
+    variable_signal=False,
 ):
     # remember to check the scale when running new analysis
 
     # sample standard normal noise for both left and right stimuli
     sampled_stimuli = np.random.normal(
-        loc=0.0, scale=1.0, size=(num_trials, max_rnn_steps_per_trial, 2)
+        loc=noise_mean, scale=noise_std, size=(num_trials, max_rnn_steps_per_trial, 2)
     )
 
     # now, determine which sides will have signal
@@ -39,7 +42,19 @@ def create_block_stimuli(
         a=trial_strengths, repeats=max_rnn_steps_per_trial, axis=1
     )
 
-    signal = np.random.normal(loc=trial_strengths, scale=np.ones_like(trial_strengths))
+    if not (variable_signal):
+        signal = np.random.normal(
+            loc=trial_strengths, scale=np.ones_like(trial_strengths)
+        )
+    else:
+        # change this to slowly reduce noise per time step
+        modified_scale = np.zeros_like(trial_strengths)
+        for idx in range(num_trials):
+            for t in range(max_rnn_steps_per_trial):
+                modified_scale[idx, t] = noise_std/(t+1) # to ensure no divison by zero
+        signal = np.random.normal(
+            loc=trial_strengths, scale=modified_scale
+        )
 
     # add signal to noise
     # rely on nice identity matrix trick for converting boolean signal_side_indices

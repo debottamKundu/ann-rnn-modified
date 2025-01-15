@@ -26,6 +26,9 @@ class IBLSession(gym.Env):
         max_obs_per_trial,
         time_delay_penalty,
         rnn_steps_before_obs,
+        noise_parameters,
+        variable_signal,
+        reward_after_time_step,
         **kwargs,
     ):
 
@@ -46,8 +49,13 @@ class IBLSession(gym.Env):
         self.rnn_steps_before_obs = rnn_steps_before_obs
         self.max_obs_per_trial = max_obs_per_trial
 
-        # NOTE : fixed regime, no time delay penalty
         self.time_delay_penalty = time_delay_penalty
+
+        ## add new variables in the new regime
+        self.noise_mean = noise_parameters[0]
+        self.noise_variance = noise_parameters[1]
+        self.variable_signal = variable_signal
+        self.reward_after_time_step = reward_after_time_step
 
         self.possible_trial_strengths = tuple(
             np.linspace(
@@ -192,6 +200,7 @@ class IBLSession(gym.Env):
             input=model_prob_output,
             is_timeout=is_timeout,
             is_blank_rnn_step=is_blank_rnn_step,
+            is_reward_per_time_step=self.reward_after_time_step,
         )
 
         timestep_data = dict(
@@ -331,7 +340,13 @@ class IBLSession(gym.Env):
                     input.shape should be (batch size = 1, num actions = 2,)
         """
 
-        def reward_fn(target, input, is_timeout, is_blank_rnn_step):
+        def reward_fn(
+            target,
+            input,
+            is_timeout,
+            is_blank_rnn_step,
+            is_reward_per_time_step=True,
+        ):
 
             # is_timeout tracks the final step, add is_timeout to the reward
             max_prob, max_prob_idx = torch.max(input, dim=1)
@@ -345,15 +360,18 @@ class IBLSession(gym.Env):
                 # changing reward to 1.0 for correct and -2.0 for incorrect for the latest run
                 if target == max_prob_idx:
                     if is_timeout:
-                        #logging.info(
+                        # logging.info(
                         #    "Correct action taken at the last step, actually in loop"
-                        #)
+                        # )
                         reward = torch.zeros(1).fill_(1).double()
                     else:
-                        #logging.info(
+                        # logging.info(
                         #    "Correct action taken at the some step before last step, actually in loop"
-                        #)
-                        reward = torch.zeros(1).fill_(0.05).double()
+                        # )
+                        if is_reward_per_time_step:
+                            reward = torch.zeros(1).fill_(0.05).double()
+                        else:
+                            reward = torch.zeros(1).double()
                 else:
                     reward = torch.zeros(1).fill_(-1).double()
                     # penalises model more for incorrect decisions.
@@ -444,6 +462,9 @@ class IBLSession(gym.Env):
                 possible_trial_strengths=self.possible_trial_strengths,
                 possible_trial_strengths_probs=self.possible_trial_strengths_probs,
                 max_rnn_steps_per_trial=self.max_rnn_steps_per_trial,
+                noise_mean=self.noise_mean,
+                noise_std=self.noise_variance,
+                variable_signal=self.variable_signal,
             )
             stimuli.append(torch.from_numpy(stimulus_creator_output["stimuli"]))
             trial_strengths.append(
