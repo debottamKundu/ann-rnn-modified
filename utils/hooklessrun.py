@@ -11,7 +11,8 @@ from torch.utils.tensorboard import SummaryWriter
 import re
 
 import utils.env
-#import utils.hooks
+
+# import utils.hooks
 import utils.models
 import utils.params
 
@@ -219,27 +220,27 @@ def extract_session_data(envs):
     return session_data
 
 
-def load_checkpoint(train_run_dir, params, sort_index):
+def load_checkpoint(train_run_dir, params, checkpoint_number):
     # collect last checkpoint in the log directory
-    checkpoint_paths = [
-        os.path.join(train_run_dir, file_path)
-        for file_path in os.listdir(train_run_dir)
-        if file_path.endswith(".pt")
-    ]
+    # checkpoint_paths = [
+    #     os.path.join(train_run_dir, file_path)
+    #     for file_path in os.listdir(train_run_dir)
+    #     if file_path.endswith(".pt")
+    # ]
 
-    # select latest checkpoint path
-    # checkpoint_path = sorted(checkpoint_paths, key=os.path.getmtime)[-1]
+    # # select latest checkpoint path
+    # # checkpoint_path = sorted(checkpoint_paths, key=os.path.getmtime)[-1]
 
-    # hacky way to get the best, cause i'm running on the local system
-    numbered_files = [f for f in checkpoint_paths if re.search(r"\d+.pt$", f)]
-    sorted_files = sorted(
-        numbered_files, key=lambda x: int(re.search(r"(\d+).pt$", x).group(1))
+    # # hacky way to get the best, cause i'm running on the local system
+    # numbered_files = [f for f in checkpoint_paths if re.search(r"\d+.pt$", f)]
+    # sorted_files = sorted(
+    #     numbered_files, key=lambda x: int(re.search(r"(\d+).pt$", x).group(1))
+    # )
+
+    #
+    checkpoint_path = os.path.join(
+        train_run_dir, f"checkpoint_grad_steps={checkpoint_number}.pt"
     )
-
-    checkpoint_path = sorted_files[
-        sort_index
-    ]  # hardcoded to get the last saved checkpoint
-    print(checkpoint_path)
     logging.info(f"Loading checkpoint at {checkpoint_path}")
 
     save_dict = torch.load(checkpoint_path)
@@ -361,7 +362,7 @@ def set_seeds(seed):
     logging.info(f"Seed: {seed}")
 
 
-def setup_analyze(train_run_id, sort_index=2):
+def setup_analyze(train_run_id, checkpoint_number):
 
     run_dir = "/usr/people/kundu/code/ann-rnn-modified/runs"
     train_run_dir = os.path.join(run_dir, train_run_id)
@@ -372,7 +373,7 @@ def setup_analyze(train_run_id, sort_index=2):
     set_seeds(seed=params["run"]["seed"])
     tensorboard_writer = create_tensorboard_writer(run_dir=analyze_run_dir)
     model, optimizer, checkpoint_grad_step = load_checkpoint(
-        train_run_dir=train_run_dir, params=params, sort_index=sort_index
+        train_run_dir=train_run_dir, params=params, checkpoint_number=checkpoint_number
     )
     loss_fn = create_loss_fn(loss_fn_params=params["loss_fn"])
     # fn_hook_dict = utils.hooks.create_hook_fns_analyze(checkpoint_grad_step=checkpoint_grad_step)
@@ -390,47 +391,6 @@ def setup_analyze(train_run_id, sort_index=2):
         # fn_hook_dict=fn_hook_dict,
         envs=envs,
         checkpoint_grad_step=checkpoint_grad_step,
-    )
-    return setup_results
-
-
-def setup_train():
-
-    log_dir = "runs"
-    os.makedirs(log_dir, exist_ok=True)
-
-    params = create_params_train()
-    run_id = create_run_id(params=params)
-    run_dir = os.path.join(
-        log_dir, run_id + "_" + str(datetime.now()).replace(":", "-")
-    )
-    # run_dir = os.path.join(log_dir, run_id + '_' + str(datetime.now()))
-    os.makedirs(run_dir, exist_ok=True)
-
-    create_logger(run_dir=run_dir)
-    set_seeds(seed=params["run"]["seed"])
-    tensorboard_writer = create_tensorboard_writer(run_dir=run_dir)
-    model = create_model(model_params=params["model"])
-    optimizer = create_optimizer(model=model, optimizer_params=params["optimizer"])
-    loss_fn = create_loss_fn(loss_fn_params=params["loss_fn"])
-    fn_hook_dict = utils.hooks.create_hook_fns_train(
-        start_grad_step=params["run"]["start_grad_step"],
-        num_grad_steps=params["run"]["num_grad_steps"],
-    )
-    envs = utils.env.create_biased_choice_worlds(
-        env_params=params["env"], base_loss_fn=loss_fn
-    )
-
-    setup_results = dict(
-        params=params,
-        run_id=run_id,
-        run_dir=run_dir,
-        tensorboard_writer=tensorboard_writer,
-        model=model,
-        optimizer=optimizer,
-        loss_fn=loss_fn,
-        fn_hook_dict=fn_hook_dict,
-        envs=envs,
     )
     return setup_results
 
