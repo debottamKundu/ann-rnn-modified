@@ -6,7 +6,9 @@ import importlib
 # hacky way, figure out proper way later
 import pickle as pkl
 import re
-import utils.hooklessrun
+import sys
+sys.path.append(os.path.abspath("../"))
+from utils.hooklessrun import run_envs, setup_analyze
 import argparse
 
 
@@ -31,16 +33,16 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def main():
-    args = parse_arguments()
+def main(args):
+    #args = parse_arguments()
 
     train_run_id = args.location
     checkpoint_number = args.number
     save_location = args.save
-    setup_results = utils.hooklessrun.setup_analyze(
+    setup_results = setup_analyze(
         train_run_id=train_run_id, checkpoint_number=checkpoint_number
     )  # TODO:change this so that i can just pass the id
-    run_envs_output = utils.hooklessrun.run_envs(
+    run_envs_output = run_envs(
         model=setup_results["model"], envs=setup_results["envs"]
     )
 
@@ -53,5 +55,5 @@ def main():
 
 
 if __name__ == "__main__":
-
-    main()
+    args = parse_arguments()
+    main(args)
