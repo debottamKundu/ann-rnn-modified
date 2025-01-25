@@ -50,6 +50,7 @@ if __name__ == "__main__":
     sorted_files = sorted(
         numbered_files, key=lambda x: int(re.search(r"(\d+).pt$", x).group(1))
     )
+    
 
     checkpoints = sorted_files
 

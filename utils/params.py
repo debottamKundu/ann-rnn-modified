@@ -26,7 +26,7 @@ train_params = {
     "loss_fn": {"loss_fn": "nll"},
     "run": {
         "start_grad_step": 0,
-        "num_grad_steps": 100001,
+        "num_grad_steps": 10000,
         "seed": 1,
     },
     "env": {
@@ -34,7 +34,7 @@ train_params = {
         "kwargs": {
             "num_stimulus_strength": 6,
             "min_stimulus_strength": 0,
-            "max_stimulus_strength": 2.0,
+            "max_stimulus_strength": 2.5,
             "block_side_probs": ((0.8, 0.2), (0.2, 0.8)),
             "trials_per_block_param": 1 / 50,
             "blocks_per_session": 4,
@@ -43,10 +43,10 @@ train_params = {
             "max_obs_per_trial": 6,
             "rnn_steps_before_obs": 1,
             "time_delay_penalty": 0,
-            "noise_parameters": (0, 1.5),
-            "variable_signal": True,
+            "noise_parameters": (0, 1),
+            "variable_signal": False,
             "reward_after_time_step": False,
         },
     },
-    "description": "Fixed time regime, 7 time steps to integrate, no reward after each timestep in a trial, higher noise but decreases per time step",
+    "description": "Fixed time regime, 7 time steps to integrate, no reward after each timestep in a trial, original parameter space, resuming training",
 }

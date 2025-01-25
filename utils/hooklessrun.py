@@ -362,9 +362,12 @@ def set_seeds(seed):
     logging.info(f"Seed: {seed}")
 
 
-def setup_analyze(train_run_id, checkpoint_number):
+def setup_analyze(
+    train_run_id,
+    checkpoint_number,
+    run_dir='"/usr/people/kundu/code/ann-rnn-modified/runs"',
+):
 
-    run_dir = "/usr/people/kundu/code/ann-rnn-modified/runs"
     train_run_dir = os.path.join(run_dir, train_run_id)
     analyze_run_dir = os.path.join(train_run_dir, "analyze")
     os.makedirs(analyze_run_dir, exist_ok=True)

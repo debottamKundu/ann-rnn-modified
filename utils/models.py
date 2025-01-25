@@ -613,7 +613,7 @@ class RecurrentModel(nn.Module):
         """
 
         core_input = torch.cat(
-            [model_input['stimulus'],
+            [       ['stimulus'],
              torch.unsqueeze(model_input['reward'], dim=2)],  # TODO: check that this change didn't break anything
             dim=2)
 

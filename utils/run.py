@@ -394,6 +394,67 @@ def setup_analyze(train_run_id, sort_index=2):
     return setup_results
 
 
+def load_checkpoint_direct(train_run_dir, params, checkpoint_number):
+
+    checkpoint_path = os.path.join(
+        train_run_dir, f"checkpoint_grad_steps={checkpoint_number}.pt"
+    )
+    logging.info(f"Loading checkpoint at {checkpoint_path}")
+
+    save_dict = torch.load(checkpoint_path)
+
+    model = create_model(model_params=params["model"])
+    model.load_state_dict(save_dict["model_state_dict"])
+
+    optimizer = create_optimizer(model=model, optimizer_params=params["optimizer"])
+    optimizer.load_state_dict(save_dict["optimizer_state_dict"])
+
+    global_step = save_dict["global_step"]
+
+    return model, optimizer, global_step
+
+
+def setup_resume_training(original_dir, checkpoint_name):
+    log_dir = "resume_training"
+    os.makedirs(log_dir, exist_ok=True)
+    params = create_params_train()
+    run_id = create_run_id(params=params)
+    run_dir = os.path.join(
+        log_dir, run_id + "_resume_" + str(datetime.now()).replace(":", "-")
+    )
+    # run_dir = os.path.join(log_dir, run_id + '_' + str(datetime.now()))
+    os.makedirs(run_dir, exist_ok=True)
+    create_logger(run_dir=run_dir)
+    set_seeds(seed=params["run"]["seed"])
+    tensorboard_writer = create_tensorboard_writer(run_dir=run_dir)
+    model, optimizer, checkpoint_grad_step = load_checkpoint_direct(
+        train_run_dir=original_dir, params=params, sort_index=checkpoint_name
+    )
+    loss_fn = create_loss_fn(loss_fn_params=params["loss_fn"])
+    # fn_hook_dict = utils.hooks.create_hook_fns_analyze(checkpoint_grad_step=checkpoint_grad_step)
+    fn_hook_dict = utils.hooks.create_hook_fns_train(
+        start_grad_step=params["run"]["start_grad_step"],
+        num_grad_steps=params["run"]["num_grad_steps"],
+    )
+    envs = utils.env.create_biased_choice_worlds(
+        env_params=params["env"], base_loss_fn=loss_fn
+    )
+
+    setup_results = dict(
+        params=params,
+        run_id=run_id,
+        run_dir=run_dir,
+        tensorboard_writer=tensorboard_writer,
+        model=model,
+        optimizer=optimizer,
+        loss_fn=loss_fn,
+        fn_hook_dict=fn_hook_dict,
+        envs=envs,
+    )
+
+    return setup_results
+
+
 def setup_train():
 
     log_dir = "runs"
