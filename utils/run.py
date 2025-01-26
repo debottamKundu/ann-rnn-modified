@@ -428,7 +428,7 @@ def setup_resume_training(original_dir, checkpoint_name):
     set_seeds(seed=params["run"]["seed"])
     tensorboard_writer = create_tensorboard_writer(run_dir=run_dir)
     model, optimizer, checkpoint_grad_step = load_checkpoint_direct(
-        train_run_dir=original_dir, params=params, sort_index=checkpoint_name
+        train_run_dir=original_dir, params=params, checkpoint_number=checkpoint_name
     )
     loss_fn = create_loss_fn(loss_fn_params=params["loss_fn"])
     # fn_hook_dict = utils.hooks.create_hook_fns_analyze(checkpoint_grad_step=checkpoint_grad_step)

@@ -239,24 +239,19 @@ class IBLSession(gym.Env):
         # NOTE: need to make changes here
         # if abs(reward.item()) > 0.9:
         if self.current_rnn_step_within_trial == self.max_rnn_steps_per_trial:
+            location = self.current_rnn_step_within_session - 1
             # record whether action was taken, which side, and whether it was correct
             if left_action_prob > 0.9 or right_action_prob > 0.9:
-                self.session_data.at[
-                    self.current_rnn_step_within_session - 1, "action_taken"
-                ] = 1.0
-                self.session_data.at[
-                    self.current_rnn_step_within_session - 1, "correct_action_taken"
-                ] = (reward == 1.0)
-                self.session_data.at[
-                    self.current_rnn_step_within_session - 1, "action_side"
-                ] = (-1.0 if left_action_prob > 0.9 else 1.0)
+                self.session_data.at[location, "action_taken"] = 1.0
+                self.session_data.at[location, "correct_action_taken"] = (
+                    reward.item() == 1.0
+                )
+                self.session_data.at[location, "action_side"] = (
+                    -1.0 if left_action_prob > 0.9 else 1.0
+                )
             else:
-                self.session_data.at[
-                    self.current_rnn_step_within_session - 1, "action_taken"
-                ] = 0.0
-                self.session_data.at[
-                    self.current_rnn_step_within_session - 1, "correct_action_taken"
-                ] = 0.0
+                self.session_data.at[location, "action_taken"] = 0.0
+                self.session_data.at[location, "correct_action_taken"] = 0.0
 
             self.current_trial_within_session += 1
 
