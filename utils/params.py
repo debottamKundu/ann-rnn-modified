@@ -26,7 +26,7 @@ train_params = {
     "loss_fn": {"loss_fn": "nll"},
     "run": {
         "start_grad_step": 0,
-        "num_grad_steps": 10000,
+        "num_grad_steps": 100000,
         "seed": 1,
     },
     "env": {

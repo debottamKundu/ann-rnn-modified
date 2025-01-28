@@ -210,9 +210,9 @@ if __name__ == "__main__":
     train_run_id = "fixed_time_stim_no_reward"  # new training run id
     run_dir = "/usr/people/kundu/code/ann-rnn-modified/runs"
     file_location = os.path.join(run_dir, train_run_id)
-    checkpoint_number = 1000
-
-    resume(location=file_location, checkpoint_number=1000)
+    checkpoint_number = 3000
+    print('Resume training with fixed weights')
+    resume(location=file_location, checkpoint_number=checkpoint_number)
     # TODO:
     # 1. add more noise in stimulus
     # 2. remove zeroing out after one timestep, it should receive 0,0,0 for the first one to signal trial start
