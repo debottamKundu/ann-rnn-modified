@@ -476,6 +476,8 @@ class RecurrentModel(nn.Module):
         elif self.output_size == 2:
             self.prob_fn = nn.Softmax(dim=2)
 
+            # NOTE: maybe we need to use log softmax here for nll loss.
+
         # converts all weights into doubles i.e. float64
         # this prevents PyTorch from breaking when multiplying float32 * float64
         self.double()
