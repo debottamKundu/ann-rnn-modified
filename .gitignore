@@ -7,3 +7,5 @@ submodule*/
 *.DS_Store
 *.pkl
 resume_training*
+*.vscode
+*.egg*
