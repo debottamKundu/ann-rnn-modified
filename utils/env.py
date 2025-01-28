@@ -29,6 +29,7 @@ class IBLSession(gym.Env):
         noise_parameters,
         variable_signal,
         reward_after_time_step,
+        decision_threshold,
         **kwargs,
     ):
 
@@ -50,6 +51,7 @@ class IBLSession(gym.Env):
         self.max_obs_per_trial = max_obs_per_trial
 
         self.time_delay_penalty = time_delay_penalty
+        self.decision_threshold = decision_threshold
 
         ## add new variables in the new regime
         self.noise_mean = noise_parameters[0]
@@ -348,7 +350,7 @@ class IBLSession(gym.Env):
 
             if is_blank_rnn_step:
                 reward = torch.zeros(1).double()
-            elif max_prob > 0.9:
+            elif max_prob > self.decision_threshold:
                 # for an action to be rewarded, the model must have made the correct choice
                 # also, punish model if action was incorrect
                 # reward = 2.0 * (target == max_prob_idx).double() - 1.0

@@ -46,7 +46,8 @@ train_params = {
             "noise_parameters": (0, 1),
             "variable_signal": False,
             "reward_after_time_step": False,
+            "decision_threshold": 0.7,
         },
     },
-    "description": "Fixed time regime, 7 time steps to integrate, no reward after each timestep in a trial, original parameter space, resuming training",
+    "description": "Fixed time regime, 7 time steps to integrate, no reward after each timestep in a trial, original parameter space, flexible decision threshold.",
 }
