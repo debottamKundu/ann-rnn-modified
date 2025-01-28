@@ -239,18 +239,33 @@ class IBLSession(gym.Env):
 
         # add constraint so that the model takes action only at the end of the trial
         # NOTE: need to make changes here
-        # if abs(reward.item()) > 0.9:
+        # if abs(reward.item()) > self.decision_threshold:
         if self.current_rnn_step_within_trial == self.max_rnn_steps_per_trial:
             location = self.current_rnn_step_within_session - 1
             # record whether action was taken, which side, and whether it was correct
-            if left_action_prob > 0.9 or right_action_prob > 0.9:
+            if (
+                left_action_prob > self.decision_threshold
+                or right_action_prob > self.decision_threshold
+            ):
                 self.session_data.at[location, "action_taken"] = 1.0
                 self.session_data.at[location, "correct_action_taken"] = (
                     reward.item() == 1.0
                 )
-                self.session_data.at[location, "action_side"] = (
-                    -1.0 if left_action_prob > 0.9 else 1.0
-                )
+                # rewrite this so that the decision threshold makes
+                # the correct decision and only iff left>right
+                # self.session_data.at[location, "action_side"] = (
+                #     -1.0 if left_action_prob > self.decision_threshold else 1.0
+                # )
+
+                if left_action_prob > right_action_prob:
+                    self.session_data.at[location, "action_side"] = -1.0
+                elif right_action_prob > left_action_prob:
+                    self.session_data.at[location, "action_side"] = 1.0
+                else:
+                    self.session_data.at[location, "action_side"] = (
+                        2.0  # equal probability
+                    )
+
             else:
                 self.session_data.at[location, "action_taken"] = 0.0
                 self.session_data.at[location, "correct_action_taken"] = 0.0
