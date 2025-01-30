@@ -9,3 +9,4 @@ submodule*/
 resume_training*
 *.vscode
 *.egg*
+*data

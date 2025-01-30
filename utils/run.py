@@ -276,6 +276,7 @@ def run_envs(model, envs, log_results=True):
             actions_logits=model_output["linear_output"],
             core_hidden=model_output["core_hidden"],
             model=model,
+            action_probs=model_output["action_output"],  # because of nn.softmax
         )
 
     envs.close()

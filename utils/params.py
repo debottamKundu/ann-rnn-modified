@@ -13,15 +13,28 @@ train_params = {
             },
         },
     },
+    # "optimizer": {
+    #     "optimizer": "sgd",
+    #     "kwargs": {
+    #         "lr": 1e-3,
+    #         "momentum": 0.1,
+    #         "nesterov": False,
+    #         "weight_decay": 0,
+    #     },
+    #     "description": "Vanilla SGD",
+    # },
     "optimizer": {
-        "optimizer": "sgd",
+        "optimizer": "adam",
         "kwargs": {
             "lr": 1e-3,
             "momentum": 0.1,
             "nesterov": False,
             "weight_decay": 0,
+            "lr": 0.001,
+            "betas": (0.9, 0.999),
+            "weight_decay": 0.001,
         },
-        "description": "Vanilla SGD",
+        "description": "Vanilla ADAM, no scheduler",
     },
     "loss_fn": {"loss_fn": "nll"},
     "run": {
@@ -49,5 +62,5 @@ train_params = {
             "decision_threshold": 0.7,
         },
     },
-    "description": "Fixed time regime, 7 time steps to integrate, no reward after each timestep in a trial, original parameter space, flexible decision threshold.",
+    "description": "Fixed time regime,log softmax,Adam.",
 }

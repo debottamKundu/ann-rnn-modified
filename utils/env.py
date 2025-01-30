@@ -29,7 +29,7 @@ class IBLSession(gym.Env):
         noise_parameters,
         variable_signal,
         reward_after_time_step,
-        decision_threshold,
+        decision_threshold=0.9,
         **kwargs,
     ):
 
@@ -139,16 +139,24 @@ class IBLSession(gym.Env):
 
         return step_output
 
-    def step(self, model_prob_output, model_logit_output, model_hidden, model):
+    def step(
+        self, model_prob_output, model_logit_output, model_hidden, model, action_probs
+    ):
         """
         :param model_prob_output: shape (time step=1, 2)
         :param model_logit_output: shape (time step=1, 2)
         :param model_hidden: shape (num layers, model hidden size)
+        :param model: Model
+        :param action_probs: softmax output
         :return:
         """
 
-        left_action_prob = model_prob_output[0, 0].item()
-        right_action_prob = model_prob_output[0, 1].item()
+        # left_action_prob = model_prob_output[0, 0].item()
+        # right_action_prob = model_prob_output[0, 1].item()
+
+        left_action_prob = action_probs[0, 0].item()
+        right_action_prob = action_probs[0, 1].item()
+
         correct_action = self.trial_sides[self.current_block_within_session][
             self.current_trial_within_block, self.current_rnn_step_within_trial
         ]
@@ -199,7 +207,8 @@ class IBLSession(gym.Env):
         ) == self.max_rnn_steps_per_trial
         reward = self.reward_fn(
             target=correct_action_index,
-            input=model_prob_output,
+            # input=model_prob_output,
+            input=action_probs,
             is_timeout=is_timeout,
             is_blank_rnn_step=is_blank_rnn_step,
             is_reward_per_time_step=self.reward_after_time_step,
@@ -248,9 +257,11 @@ class IBLSession(gym.Env):
                 or right_action_prob > self.decision_threshold
             ):
                 self.session_data.at[location, "action_taken"] = 1.0
-                self.session_data.at[location, "correct_action_taken"] = (
-                    reward.item() == 1.0
-                )
+
+                if reward.item() == 1.0:
+                    self.session_data.at[location, "correct_action_taken"] = 1.0
+                else:
+                    self.session_data.at[location, "correct_action_taken"] = 0.0
                 # rewrite this so that the decision threshold makes
                 # the correct decision and only iff left>right
                 # self.session_data.at[location, "action_side"] = (

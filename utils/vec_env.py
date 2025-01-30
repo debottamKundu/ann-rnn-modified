@@ -30,16 +30,14 @@ class VecEnv(object):
         obs = _flatten_list_of_dicts(obs)
         return obs
 
-    def step(self,
-             actions,
-             actions_logits,
-             core_hidden,
-             model):
+    def step(self, actions, actions_logits, core_hidden, model, action_probs):
 
         assert len(self.envs) == len(actions) == len(core_hidden)
         results = []
-        for env, a, al, h in zip(self.envs, actions, actions_logits, core_hidden):
-            results.append(env.step(a, al, h, model))
+        for env, a, al, h, ap in zip(
+            self.envs, actions, actions_logits, core_hidden, action_probs
+        ):
+            results.append(env.step(a, al, h, model, ap))
         results = _flatten_list_of_dicts(results)
         return results
 

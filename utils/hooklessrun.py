@@ -372,6 +372,7 @@ def setup_analyze(
     analyze_run_dir = os.path.join(train_run_dir, "analyze")
     os.makedirs(analyze_run_dir, exist_ok=True)
     create_logger(run_dir=analyze_run_dir)
+    print("here and back again")
     params = create_params_analyze(train_run_dir=train_run_dir)
     set_seeds(seed=params["run"]["seed"])
     tensorboard_writer = create_tensorboard_writer(run_dir=analyze_run_dir)
